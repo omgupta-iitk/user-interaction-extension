@@ -1,0 +1,23 @@
+{
+    "name": "USER TRACKING",
+    "version": "1.0.0",
+    "description": "tracking",
+    "permissions": ["storage", "tabs"],
+    "host_permissions": ["<all_urls>"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["<all_urls>"],
+        "js": ["contentScript.js"]
+      }
+    ],
+
+    "action": {
+      "default_title": "content",
+      "default_popup": "popup.html"
+    },
+    "manifest_version": 3
+  }
+  
