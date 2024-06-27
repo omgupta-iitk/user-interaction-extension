@@ -4,9 +4,6 @@
     "description": "tracking",
     "permissions": ["storage", "tabs"],
     "host_permissions": ["<all_urls>"],
-    "background": {
-      "service_worker": "background.js"
-    },
     "content_scripts": [
       {
         "matches": ["<all_urls>"],

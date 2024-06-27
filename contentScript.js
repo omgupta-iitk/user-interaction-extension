@@ -1,5 +1,4 @@
 (() => {
-    alert("hiii");
 var userBehaviour = (function () {
     var defaults = {
         userInfo: true,
@@ -201,20 +200,21 @@ var userBehaviour = (function () {
     };
 
 })();
-alert("RECV");
-chrome.runtime.onMessage.addListener((obj, sender, response) => {
-    const { type, value, videoId } = obj;
-    alert("RECV");
-    if (type === "START") {
-        alert("START");
+console.log("I am a content script!");
+chrome.runtime.onMessage.addListener(function(obj, sender, response){
+    console.log("RECV");
+    if (obj.message === "START") {
+        console.log("START");
         userBehaviour.start();
-    } else if (type === "STOP") {
-      userBehaviour.stop();
-    } else if ( type === "RESULT") {
-      let curr = '0';
-      data = userBehaviour.showResult()
-      alert(data);
-      chrome.storage.sync.set({ [curr]: JSON.stringify(data)});
+    } else if (obj.message === "STOP") {
+        console.log("STOP");
+        userBehaviour.stop();
+    } else if ( obj.message === "RESULT") {
+        console.log("RESULT");
+        // let curr = '0';
+        data = userBehaviour.showResult();
+        console.log(data);
+        // chrome.storage.sync.set({ [curr]: JSON.stringify(data)});
 
     }
   });
