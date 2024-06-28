@@ -1,29 +1,44 @@
-import { GoogleGenerativeAI } from "/node_modules/@google/generative-ai/dist/index.mjs";
-document.addEventListener("DOMContentLoaded", runFuction);
+document.addEventListener("DOMContentLoaded", runFunction);
 console.log("DOM is ready");
-function runFuction() {
+var hasBeenStopped = false;
 
-
-
+function runFunction() {
   let button1 = document.getElementById('start');
   button1.addEventListener("click", start);
-  // let button2 = document.getElementById('stop');
-  // button2.addEventListener("click",stop);
   let button3 = document.getElementById('result');
-  button3.addEventListener("click", result);
-
+  button3.addEventListener('click', result);
+  let button2 = document.getElementById('stop');
+  function stop() {
+    hasBeenStopped = true;
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      console.log("stop sending....")
+      let activeTabId = tabs[0].id;
+      chrome.tabs.sendMessage(activeTabId, { message: "STOP" });
+      return;
+    });
+  }
+  button2.addEventListener("click", stop);
   function start() {
+    hasBeenStopped = false;
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       console.log("start sending....")
       let activeTabId = tabs[0].id;
       chrome.tabs.sendMessage(activeTabId, { message: "START" });
     });
-    setInterval(() => {
+    var intrv = setInterval(() => {
+      console.log(hasBeenStopped);
+      if (hasBeenStopped) {
+        clearInterval(intrv);
+        return;
+      }
       console.log("sent....")
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         console.log("result sending....")
-        let activeTabId = tabs[0].id;
-        chrome.tabs.sendMessage(activeTabId, { message: "RESULT" });
+        chrome.tabs.captureVisibleTab().then((dataUrl) => {
+          let activeTabId = tabs[0].id;
+          chrome.tabs.sendMessage(activeTabId, { message: "RESULT", ss: dataUrl});
+        })
+        
         // narate(data);
         // console.log(data)
       });
@@ -43,36 +58,26 @@ function runFuction() {
       //   run(json)
       //   console.log(json)
       // }
-      let button2 = document.getElementById('stop');
-      button2.addEventListener("click", stop);
-      function stop() {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-          console.log("stop sending....")
-          let activeTabId = tabs[0].id;
-          chrome.tabs.sendMessage(activeTabId, { message: "STOP" });
-          return;
-        });
-      }
 
     }, 10 * 1000)
 
   }
-  // function stop() {
-  //   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  //     console.log("stop sending....")
-  //     let activeTabId = tabs[0].id;
-  //     chrome.tabs.sendMessage(activeTabId, { message: "STOP" });
-  //   });
-  // }
-  // function result() {
-  //   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  //     console.log("result sending....")
-  //     let activeTabId = tabs[0].id;
-  //     let data = chrome.tabs.sendMessage(activeTabId, { message: "RESULT" });
-  //     let summary = chrome.tabs.sendMessage(activeTabId, { message: "NARATE" , data:data});
-  //     console.log(summary);
-  //   });
-  // }
+  function stop() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      console.log("stop sending....")
+      let activeTabId = tabs[0].id;
+      chrome.tabs.sendMessage(activeTabId, { message: "STOP" });
+    });
+  }
+  function result() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      console.log("result sending....")
+      let activeTabId = tabs[0].id;
+      let data = chrome.tabs.sendMessage(activeTabId, { message: "RESULT" });
+      // let summary = chrome.tabs.sendMessage(activeTabId, { message: "NARATE" , data:data});
+      // console.log(summary);
+    });
+  }
 
 
 

