@@ -266,7 +266,7 @@ chrome.runtime.onMessage.addListener(function(obj, sender, response){
         let data = userBehaviour.showResult();
         console.log(data);
         chrome.runtime.sendMessage({
-            total_elements: data, // or whatever you want to send
+            total_elements: data, 
             full_html: txt
           });
         // chrome.storage.sync.set({ [curr]: JSON.stringify(data)});
