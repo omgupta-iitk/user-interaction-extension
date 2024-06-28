@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "@google/generative-ai": "^0.14.0",
+    "path-fixxer": "^0.3.2"
+  },
+  "type": "module",
+  "scripts": {"path": "node --experimental-import-meta-resolve path.js"}
+}

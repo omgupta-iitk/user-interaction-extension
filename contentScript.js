@@ -16,8 +16,7 @@ var userBehaviour = (function () {
             console.log(results);
         },
     };
-    
-    var user_config = {};
+    var user_config = {}
     var mem = {
         processInterval: null,
         mouseInterval: null,
@@ -212,10 +211,19 @@ chrome.runtime.onMessage.addListener(function(obj, sender, response){
     } else if ( obj.message === "RESULT") {
         console.log("RESULT");
         // let curr = '0';
-        data = userBehaviour.showResult();
+        let data = userBehaviour.showResult();
         console.log(data);
+        chrome.runtime.sendMessage({
+            total_elements: data // or whatever you want to send
+          });
         // chrome.storage.sync.set({ [curr]: JSON.stringify(data)});
-
     }
   });
+//   function narate(results){
+//     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+//         console.log("NARATING")
+//         let activeTabId = tabs[0].id;
+//         chrome.tabs.sendMessage(activeTabId, { message: "NARATE" });
+//       });
+//   }
 })();
