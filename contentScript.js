@@ -13,6 +13,7 @@ var userBehaviour = (function () {
         processTime: 15,
         windowResize: true,
         visibilitychange: true,
+        gazeTracking: true,
         processData: function (results) {
             console.log(results);
         },
@@ -28,7 +29,18 @@ var userBehaviour = (function () {
             mouseMovement: null,
             windowResize: null,
             visibilitychange: null,
-            keyLogger: null
+            keyLogger: null,
+            gazeListener: null
+        },
+        initGazeTracking : function() {
+            if (!defaults.gazeTracking) return;
+            webgazer.setGazeListener((data, elapsedTime) => {
+                if (data) {
+                    const x = data.x;
+                    const y = data.y;
+                    results.gazeData.append([x,y,getTimeStamp()]);
+                }
+            }).begin();
         },
         eventsFunctions: {
             scroll: () => {
@@ -117,7 +129,7 @@ var userBehaviour = (function () {
             keyLogger: [], //todo
             windowSizes: [],
             visibilitychanges: [],
-            img : ""
+            gazeData: []
         }
     };
     resetResults();
@@ -174,6 +186,9 @@ var userBehaviour = (function () {
         if (user_config.keyLogger !== false){
             mem.eventsFunctions.keyLogger();
         }
+        if (user_config.gazeTracking !== false){
+            mem.initGazeTracking();
+        }
         //PROCESS INTERVAL
         if (user_config.processTime !== false) {
             mem.processInterval = setInterval(() => {
@@ -195,6 +210,8 @@ var userBehaviour = (function () {
             clearInterval(mem.processInterval);
         }
         clearInterval(mem.mouseInterval);
+        webgazer.end();
+        console.log("this has run");
         window.removeEventListener("scroll", mem.eventsFunctions.scroll);
         window.removeEventListener("click", mem.eventsFunctions.click);
         window.removeEventListener("mousemove", mem.eventsFunctions.mouseMovement);
@@ -240,6 +257,7 @@ chrome.runtime.onMessage.addListener(function(obj, sender, response){
     } else if (obj.message === "STOP") {
         console.log("STOP");
         userBehaviour.stop();
+        webgazer.end();
     } else if ( obj.message === "RESULT") {
         const txt = document.documentElement.outerHTML;
         let dataUrl = obj.ss;
