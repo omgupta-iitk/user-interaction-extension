@@ -38,7 +38,7 @@ var userBehaviour = (function () {
                 if (data) {
                     const x = data.x;
                     const y = data.y;
-                    results.gazeData.append([x,y,getTimeStamp()]);
+                    results.gazeData.push([x,y,getTimeStamp()]);
                 }
             }).begin();
         },
