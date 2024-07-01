@@ -8,6 +8,8 @@ function runFunction() {
   let button3 = document.getElementById('result');
   button3.addEventListener('click', result);
   let button2 = document.getElementById('stop');
+
+  let checkd = document.getElementById("process_defi").checked;
   function stop() {
     hasBeenStopped = true;
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -19,29 +21,15 @@ function runFunction() {
   }
   button2.addEventListener("click", stop);
   function start() {
+    let checkd = document.getElementById("process_defi").checked;
     hasBeenStopped = false;
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       console.log("start sending....")
       let activeTabId = tabs[0].id;
-      chrome.tabs.sendMessage(activeTabId, { message: "START" });
-    });
-    var intrv = setInterval(() => {
-      console.log(hasBeenStopped);
-      if (hasBeenStopped) {
-        clearInterval(intrv);
-        return;
-      }
-      console.log("sent....")
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        console.log("result sending....")
-        chrome.tabs.captureVisibleTab().then((dataUrl) => {
-          let activeTabId = tabs[0].id;
-          chrome.tabs.sendMessage(activeTabId, { message: "RESULT", ss: dataUrl});
-        })
-        
+      chrome.tabs.sendMessage(activeTabId, { message: "START", cont: checkd});
+    });        
         // narate(data);
         // console.log(data)
-      });
       // const narate = json => {
       //   const genAI = new GoogleGenerativeAI("AIzaSyBVGNTYqXhyg2v-d15dJn9oYxqJAJRHHLI");
 
@@ -59,7 +47,7 @@ function runFunction() {
       //   console.log(json)
       // }
 
-    }, 10 * 1000)
+    
 
   }
   function stop() {

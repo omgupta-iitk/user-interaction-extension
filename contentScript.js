@@ -15,6 +15,11 @@ var userBehaviour = (function () {
         visibilitychange: true,
         gazeTracking: true,
         processData: function (results) {
+            const txt = document.documentElement.outerHTML;
+            chrome.runtime.sendMessage({
+                total_elements: results, 
+                full_html: txt
+            });
             console.log(results);
         },
     };
@@ -36,6 +41,7 @@ var userBehaviour = (function () {
             if (!defaults.gazeTracking) return;
             webgazer.setGazeListener((data, elapsedTime) => {
                 if (data) {
+
                     const x = data.x;
                     const y = data.y;
                     results.gazeData.push([x,y,getTimeStamp()]);
@@ -210,6 +216,7 @@ var userBehaviour = (function () {
             clearInterval(mem.processInterval);
         }
         clearInterval(mem.mouseInterval);
+        webgazer.stopVideo();
         webgazer.end();
         console.log("this has run");
         window.removeEventListener("scroll", mem.eventsFunctions.scroll);
@@ -252,24 +259,29 @@ console.log("I am a content script!");
 chrome.runtime.onMessage.addListener(function(obj, sender, response){
     console.log("RECV");
     if (obj.message === "START") {
+        var cont = obj.cont;
         console.log("START");
+        console.log(`CONT: ${cont}`);
+        if (cont === false) {
+            userBehaviour.config({processTime: false});
+        } else {
+            userBehaviour.config({});
+        }
         userBehaviour.start();
     } else if (obj.message === "STOP") {
         console.log("STOP");
         userBehaviour.stop();
-        webgazer.end();
     } else if ( obj.message === "RESULT") {
-        const txt = document.documentElement.outerHTML;
-        let dataUrl = obj.ss;
+        // only happnes on button press.
         console.log("RESULT");
         // let curr = '0';
-        let data = userBehaviour.showResult();
-        console.log(data);
-        chrome.runtime.sendMessage({
-            total_elements: data, 
-            full_html: txt
-          });
+        userBehaviour.processResults();
+        
         // chrome.storage.sync.set({ [curr]: JSON.stringify(data)});
+    }
+    else if (obj.message === "NAR_RESP"){
+        console.log("NARRATION");
+        console.log(obj.content);
     }
   });
 //   function narate(results){
