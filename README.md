@@ -28,7 +28,7 @@ The extension is capable of running in two modes, *continuous output*, and *cumu
 The data will be printed in the console, where the user interaction data will be printed as an object, followed by the narration. Note that there may be some delay in the narration to print due to LLM api calls.
 
 ## Video Of Use
-![Video of usage](https://github.com/omgupta-iitk/user-interaction-extension/assets/44142719/f76dafbd-08e8-4d12-b2a1-946e12ad5370)
+https://github.com/omgupta-iitk/user-interaction-extension/assets/44142719/f76dafbd-08e8-4d12-b2a1-946e12ad5370
 ## Dependencies
 
 - `@google/generative-ai`: For generating content based on user interactions.
