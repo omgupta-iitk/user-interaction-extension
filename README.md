@@ -20,7 +20,6 @@ The USER TRACKING extension is a powerful tool designed to monitor and analyze u
 ## Usage
 The extension is capable of running in two modes, *continuous output*, and *cumulative output*. The modes can be selected by checking and unchecking the *Continuous output* checkbox on the extension popup, before clicking on **START**.
 
-
 ![Image of popup](image.png)
 - **Continuous Output** (*default*): In this mode, the user interaction details are printed on the console every 15 seconds. The details are printed and reset every time, hence are not accumulated.
 - **Cumulative Output**: As is evident from its name, the interaction details are printed only on demand, either when the user clicks **STOP** and ends the data collection session or when they click **GET RESULT**.
@@ -28,6 +27,8 @@ The extension is capable of running in two modes, *continuous output*, and *cumu
 
 The data will be printed in the console, where the user interaction data will be printed as an object, followed by the narration. Note that there may be some delay in the narration to print due to LLM api calls.
 
+## Video Of Use
+![Video of usage](https://github.com/omgupta-iitk/user-interaction-extension/assets/44142719/f76dafbd-08e8-4d12-b2a1-946e12ad5370)
 ## Dependencies
 
 - `@google/generative-ai`: For generating content based on user interactions.
